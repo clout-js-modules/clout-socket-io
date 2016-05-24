@@ -12,15 +12,20 @@ module.exports = {
 		event: 'start',
 		priority: 26,
 		fn: function (next) {
-			var self = this,
-				sessionMiddleware = this.app.session;
-
-			// start socket
 			debug('start socket');
 			this.sio = socket(this.server.http);
-
+			next();
+		}
+	},
+	middleware: {
+		event: 'start',
+		priority: 27,
+		fn: function (next) {
+			var self = this,
+				sessionMiddleware = this.app.session;
+			debug('initialize sessionMiddleware');
 			// append session information from express
-			this.sio.use(function(socket, next) {
+			this.sio.use(function (socket, next) {
 				// expose clout server
 				socket.logger = self.logger;
 				socket.models = self.models;
