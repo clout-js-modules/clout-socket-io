@@ -1,18 +1,16 @@
 /*!
  * clout-socket-io
- * Copyright(c) 2015 - 2016 Muhammad Dadu
+ * Copyright(c) 2015 - 2018 Muhammad Dadu
  * MIT Licensed
  */
-const
-	debug = require('debug')('clout-socket-io:hooks/socket'),
-	socket = require('socket.io');
+const socket = require('socket.io');
 
 module.exports = {
 	initialize: {
 		event: 'start',
 		priority: 26,
 		fn: function (next) {
-			debug('start socket');
+			this.logger.info('attached socket to server');
 			this.sio = socket(this.server.http);
 			next();
 		}
@@ -21,23 +19,25 @@ module.exports = {
 		event: 'start',
 		priority: 27,
 		fn: function (next) {
-			var self = this,
-				sessionMiddleware = this.app.session;
-			debug('initialize sessionMiddleware');
+			let sessionMiddleware = this.app.session;
+
+			this.logger.info('attaching clout-js middleware to socket');
+
 			// append session information from express
-			this.sio.use(function (socket, next) {
+			this.sio.use((socket, next) => {
 				// expose clout server
-				socket.logger = self.logger;
-				socket.models = self.models;
+				socket.logger = this.logger;
+				socket.models = this.models;
+
 				// check if sessionMiddleware exists
 				if (!sessionMiddleware) {
-					debug('sessionMiddleware not found');
-					self.logger.warn('sessionMiddleware not found');
+					this.logger.warn('sessionMiddleware not found');
 					return next();
 				}
-				debug('sessionMiddleware appended');
+
 				sessionMiddleware(socket.request, socket.request.res, next);
 			});
+
 			next();
 		}
 	}
