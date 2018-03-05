@@ -52,10 +52,8 @@ class CloutSocketHandler {
         socket[this.type](this.event, (data, next) => this._handle(socket, data, next));
     }
 
-    _call(fn, data, next) {
-        fn.apply({
-            socket: socket
-        }, [data, next]);
+    _call(socket, fn, data, next) {
+        fn.apply({ socket }, [data, next]);
     }
 
     _handle(socket, data, next) {

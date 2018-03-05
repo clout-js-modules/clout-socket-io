@@ -31,6 +31,7 @@
     "socket.io": "^2.0.4"
   },
   "devDependencies": {
+    "clout-js": "^2.0.0-beta.5",
     "eslint": "^4.17.0",
     "grunt": "^1.0.2",
     "grunt-jsdoc": "^2.2.1",

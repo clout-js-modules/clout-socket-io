@@ -27,16 +27,16 @@ class CloutSocketManager {
         this.initialize();
     }
 
-    createGlobForPath(path) {
-        return path.join(path, 'sockets/**.js');
+    createGlobForPath(dir) {
+        return path.join(dir, 'sockets/**.js');
     }
 
     initialize() {
         let applicationSocketsGlob = this.createGlobForPath(this.clout.rootDirectory);
         let moduleSocketsGlobs = this.clout.modules.map((module) => this.createGlobForPath(module.path));
 
-        this.initializeSocketHandlersForFiles(applicationSocketsGlob);
-        moduleSocketsGlobs.forEach((path) => this.initializeSocketHandlersForFiles(path));
+        this.initializeSocketHandlersForFiles(getGlobbedFiles(applicationSocketsGlob));
+        moduleSocketsGlobs.forEach((path) => this.initializeSocketHandlersForFiles(getGlobbedFiles(path)));
     }
 
     /**
@@ -89,7 +89,7 @@ class CloutSocketManager {
         let handlers = this.handlers[socket.nsp.name] || [];
 
         socket.on('disconnect', () => this.onDisconnect(socket));
-        handlers.forEach((handler) => handler.attachToClient(client));
+        handlers.forEach((handler) => handler.attachToClient(socket));
     }
 
     /**
