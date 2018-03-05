@@ -1,6 +1,6 @@
 {
   "name": "clout-socket-io",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Clout module to leverage socket.io",
   "main": "index.js",
   "scripts": {
