@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>1-handle-a-socket - Documentation</title>
+    <title>hookslib/CloutSocketHandler.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,71 +29,94 @@
 
 <div id="main">
     
-    <h1 class="page-title">1-handle-a-socket</h1>
+    <h1 class="page-title">hookslib/CloutSocketHandler.js</h1>
     
 
+    
+
+
+
+    
     <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*!
+ * clout-socket-io
+ * Copyright(c) 2018 Muhammad Dadu
+ * MIT Licensed
+ */
+const { each } = require('async');
 
-<header>
-    
-</header>
+/**
+ * Priority for core hooks
+ * @typedef {object} CLOUT_SOCKET_HANDLER_DEFAULTS
+ * @property {string} type on
+ * @property {string} nsp /
+ * @property {array} hooks []
+ * @const
+ */
+const CLOUT_SOCKET_HANDLER_DEFAULTS = {
+    type: 'on',
+    namespace: '/',
+    hooks: []
+};
 
-<article>
-    <h1>Handle a socket call</h1><blockquote>
-<p>Handling a socket should not be complicated. We have found you an elegent standardized solution.</p>
-</blockquote>
-<p>1) Create a new file in the <code>sockets/</code> directory</p>
-<p>2) Add the following to the file
-e.g. chat.js</p>
-<pre class="prettyprint source lang-javascript"><code>module.exports = {
-    join: {
-        type: 'on',
-        event: 'join',
-        namespace: '/chat',
-        fn(roomName, cb) {
-            this.client.join(roomName);
-            cb('Success');
-        }
+/**
+ * CloutSocketManager
+ * @class
+ */
+class CloutSocketHandler {
+
+    /**
+     * @param {object} opts handleroptions
+     * @param {string} opts.group group
+     * @param {string} opts.event event name
+     * @param {string} opts.fn function to be executed
+     * @param {string} [opts.type] typeof event
+     * @param {string} [opts.namespace] namespace
+     * @param {array} [opts.hooks] middleware for your events [(data, next) => next()]
+     */
+    constructor(opts) {
+        this.name = opts.name;
+        this.group = opts.group;
+        this.event = opts.event;
+        this.fn = opts.fn;
+
+        this.type = opts.type || CLOUT_SOCKET_HANDLER_DEFAULTS.type;
+        this.nsp = opts.namespace || CLOUT_SOCKET_HANDLER_DEFAULTS.namespace;
+        this.hooks = opts.hooks || CLOUT_SOCKET_HANDLER_DEFAULTS.hooks;
     }
-}</code></pre><p>3) Lets create another endpoint</p>
-<pre class="prettyprint source lang-javascript"><code>...
-    leave: {
-        type: 'on',
-        event: 'join',
-        namespace: '/chat',
-        fn(roomName, cb) {
-            this.client.leave(roomName);
-            cb('Success');
-        }
-    },
-    sendMessege: {
-        type: 'on',
-        event: 'send_messege',
-        namespace: '/chat',
-        fn(data, cb) {
-            let {roomName, messege} = data;
-            io.to(roomName).emit('messege', {
-                roomName, messege
-            });
-        }
+
+    /**
+     * @param {object} socket socket.io socket object
+     */
+    attachToClient(socket) {
+        socket[this.type](this.event, (data, next) => this._handle(socket, data, next));
     }
-...</code></pre><p>4) Example usage</p>
-<p>Note: this following example requires a transpiler for front-end or to manually include the dependencies.</p>
-<p>Requires: socket.io-client</p>
-<pre class="prettyprint source lang-javascript"><code>const io = require('socket.io-client');
-const chatSocket = io.connect('/chat');
 
-chatSocket.emit('join', 'general');
+    _call(fn, data, next) {
+        fn.apply({
+            socket: socket
+        }, [data, next]);
+    }
 
-chatSocket.on('messege', (data) => {
-    let {messege} = data;
-    console.log(messege);
-});
+    _handle(socket, data, next) {
+        each(this.hooks,
+            (hook, next) => _call(socket, hook, data, next),
+            (err) => {
+                if (err) { return next(err); }
+                this._call(socket, this.fn, data, next);
+            }
+        );
+    }
+}
 
-chatSocket.emit('send_messege', 'Hello World!');</code></pre>
-</article>
+module.exports = CloutSocketHandler;
+</code></pre>
+        </article>
+    </section>
 
-</section>
+
+
 
 </div>
 

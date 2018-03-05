@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>1-handle-a-socket - Documentation</title>
+    <title>hookslib/CloutSocketManager.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,71 +29,127 @@
 
 <div id="main">
     
-    <h1 class="page-title">1-handle-a-socket</h1>
+    <h1 class="page-title">hookslib/CloutSocketManager.js</h1>
     
 
+    
+
+
+
+    
     <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*!
+ * clout-socket-io
+ * Copyright(c) 2018 Muhammad Dadu
+ * MIT Licensed
+ */
+const _ = require('lodash');
+const path = require('path');
+const { getGlobbedFiles } = require('clout-js/lib/utils');
+const CloutSocketHandler = require('./CloutSocketHandler');
 
-<header>
-    
-</header>
+/**
+ * CloutSocketManager
+ * @class
+ */
+class CloutSocketManager {
 
-<article>
-    <h1>Handle a socket call</h1><blockquote>
-<p>Handling a socket should not be complicated. We have found you an elegent standardized solution.</p>
-</blockquote>
-<p>1) Create a new file in the <code>sockets/</code> directory</p>
-<p>2) Add the following to the file
-e.g. chat.js</p>
-<pre class="prettyprint source lang-javascript"><code>module.exports = {
-    join: {
-        type: 'on',
-        event: 'join',
-        namespace: '/chat',
-        fn(roomName, cb) {
-            this.client.join(roomName);
-            cb('Success');
-        }
+    /**
+     * @constructor
+     * @param {object} io socket.io instance
+     */
+    constructor(clout) {
+        this.clout = clout;
+        this.logger = clout.logger;
+        this.io = clout.sio;
+        this.handlers = {};
+
+        this.initialize();
     }
-}</code></pre><p>3) Lets create another endpoint</p>
-<pre class="prettyprint source lang-javascript"><code>...
-    leave: {
-        type: 'on',
-        event: 'join',
-        namespace: '/chat',
-        fn(roomName, cb) {
-            this.client.leave(roomName);
-            cb('Success');
-        }
-    },
-    sendMessege: {
-        type: 'on',
-        event: 'send_messege',
-        namespace: '/chat',
-        fn(data, cb) {
-            let {roomName, messege} = data;
-            io.to(roomName).emit('messege', {
-                roomName, messege
+
+    createGlobForPath(path) {
+        return path.join(path, 'sockets/**.js');
+    }
+
+    initialize() {
+        let applicationSocketsGlob = this.createGlobForPath(this.clout.rootDirectory);
+        let moduleSocketsGlobs = this.clout.modules.map((module) => this.createGlobForPath(module.path));
+
+        this.initializeSocketHandlersForFiles(applicationSocketsGlob);
+        moduleSocketsGlobs.forEach((path) => this.initializeSocketHandlersForFiles(path));
+    }
+
+    /**
+     * initializes socket handling for files
+     * @param {array} files
+     */
+    initializeSocketHandlersForFiles(files) {
+        this.logger.debug(`loading socket handlers from '${files}'`);
+
+        files.forEach((filePath) => {
+            let file = require(filePath);
+            let names = Object.keys(file);
+            let group = path.basename(filePath, 'js');
+
+            this.logger.debug(`loading socket handler from file '${filePath}'`);
+
+            names.forEach((name) => {
+                let handlerOpts = Object.assign({
+                    name: name,
+                    group: group,
+                }, file[name]);
+                let handler = new CloutSocketHandler(handlerOpts);
+
+                if (!this.handlers[handler.nsp]) {
+                    this.createNamespace(handler.nsp);
+                }
+
+                this.handlers[handler.nsp].push(handler);
             });
-        }
+        });
+
+        this.logger.debug(`loading socket handlers '${this.handlers}'`);
     }
-...</code></pre><p>4) Example usage</p>
-<p>Note: this following example requires a transpiler for front-end or to manually include the dependencies.</p>
-<p>Requires: socket.io-client</p>
-<pre class="prettyprint source lang-javascript"><code>const io = require('socket.io-client');
-const chatSocket = io.connect('/chat');
 
-chatSocket.emit('join', 'general');
+    /**
+     * attaches socket handling to namespace
+     * @param {string} name
+     */
+    createNamespace(name) {
+        this.handlers[name] = [];
+        this.io.of(name).on('connection', (client) => this.onConnection(client));
+    }
 
-chatSocket.on('messege', (data) => {
-    let {messege} = data;
-    console.log(messege);
-});
+    /**
+     * onConnection
+     * @param {object} socket
+     * @param {object} socket.id
+     */
+    onConnection(socket) {
+        let handlers = this.handlers[socket.nsp.name] || [];
 
-chatSocket.emit('send_messege', 'Hello World!');</code></pre>
-</article>
+        socket.on('disconnect', () => this.onDisconnect(socket));
+        handlers.forEach((handler) => handler.attachToClient(client));
+    }
 
-</section>
+    /**
+     * onDisconnect
+     * @param {object} client
+     * @param {object} client.id
+     */
+    onDisconnect(client) {
+        
+    }
+}
+
+module.exports = CloutSocketManager;
+</code></pre>
+        </article>
+    </section>
+
+
+
 
 </div>
 

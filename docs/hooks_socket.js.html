@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>1-handle-a-socket - Documentation</title>
+    <title>hooks/socket.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,71 +29,97 @@
 
 <div id="main">
     
-    <h1 class="page-title">1-handle-a-socket</h1>
+    <h1 class="page-title">hooks/socket.js</h1>
     
 
+    
+
+
+
+    
     <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*!
+ * clout-socket-io
+ * Copyright(c) 2015 - 2018 Muhammad Dadu
+ * MIT Licensed
+ */
 
-<header>
-    
-</header>
+/**
+ * @module clout-socket-io/hooks/socket
+ */
+const socket = require('socket.io');
+const CloutSocketManager = require('../hookslib/CloutSocketManager');
 
-<article>
-    <h1>Handle a socket call</h1><blockquote>
-<p>Handling a socket should not be complicated. We have found you an elegent standardized solution.</p>
-</blockquote>
-<p>1) Create a new file in the <code>sockets/</code> directory</p>
-<p>2) Add the following to the file
-e.g. chat.js</p>
-<pre class="prettyprint source lang-javascript"><code>module.exports = {
-    join: {
-        type: 'on',
-        event: 'join',
-        namespace: '/chat',
-        fn(roomName, cb) {
-            this.client.join(roomName);
-            cb('Success');
-        }
-    }
-}</code></pre><p>3) Lets create another endpoint</p>
-<pre class="prettyprint source lang-javascript"><code>...
-    leave: {
-        type: 'on',
-        event: 'join',
-        namespace: '/chat',
-        fn(roomName, cb) {
-            this.client.leave(roomName);
-            cb('Success');
-        }
-    },
-    sendMessege: {
-        type: 'on',
-        event: 'send_messege',
-        namespace: '/chat',
-        fn(data, cb) {
-            let {roomName, messege} = data;
-            io.to(roomName).emit('messege', {
-                roomName, messege
-            });
-        }
-    }
-...</code></pre><p>4) Example usage</p>
-<p>Note: this following example requires a transpiler for front-end or to manually include the dependencies.</p>
-<p>Requires: socket.io-client</p>
-<pre class="prettyprint source lang-javascript"><code>const io = require('socket.io-client');
-const chatSocket = io.connect('/chat');
+module.exports = {
+	/**
+	 * add socket.io to server
+	 * @property {event} event start
+	 * @property {priority} priority 26
+	 */
+	initialize: {
+		event: 'start',
+		priority: 26,
+		fn: function (next) {
+			this.logger.info('attached socket to server');
+			this.sio = socket(this.server.http);
+			next();
+		}
+	},
 
-chatSocket.emit('join', 'general');
+	/**
+	 * attach clout middleware to socket
+	 * @property {event} event start
+	 * @property {priority} priority 27
+	 */
+	middleware: {
+		event: 'start',
+		priority: 27,
+		fn: function (next) {
+			let sessionMiddleware = this.app.session;
 
-chatSocket.on('messege', (data) => {
-    let {messege} = data;
-    console.log(messege);
-});
+			this.logger.info('attaching clout-js middleware');
 
-chatSocket.emit('send_messege', 'Hello World!');</code></pre>
-</article>
+			// append session information from express
+			this.sio.use((socket, next) => {
+				// expose clout server
+				socket.logger = this.logger;
+				socket.models = this.models;
 
-</section>
+				// check if sessionMiddleware exists
+				if (!sessionMiddleware) {
+					this.logger.warn('sessionMiddleware not found');
+					return next();
+				}
+
+				sessionMiddleware(socket.request, socket.request.res, next);
+			});
+
+			next();
+		}
+	},
+
+	/**
+	 * attach clout socket manager to socket
+	 * @property {event} event start
+	 * @property {priority} priority 28
+	 */
+	socketManager: {
+		event: 'start',
+		priority: 28,
+		fn: function (next) {
+			this.logger.info('attaching clout-js CloutSocketManager');
+			this.modules.socketManager = new CloutSocketManager(this);
+			next();
+		}
+	}
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
 
 </div>
 

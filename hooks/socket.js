@@ -3,10 +3,19 @@
  * Copyright(c) 2015 - 2018 Muhammad Dadu
  * MIT Licensed
  */
+
+/**
+ * @module clout-socket-io/hooks/socket
+ */
 const socket = require('socket.io');
 const CloutSocketManager = require('../hookslib/CloutSocketManager');
 
 module.exports = {
+	/**
+	 * add socket.io to server
+	 * @property {event} event start
+	 * @property {priority} priority 26
+	 */
 	initialize: {
 		event: 'start',
 		priority: 26,
@@ -16,6 +25,12 @@ module.exports = {
 			next();
 		}
 	},
+
+	/**
+	 * attach clout middleware to socket
+	 * @property {event} event start
+	 * @property {priority} priority 27
+	 */
 	middleware: {
 		event: 'start',
 		priority: 27,
@@ -42,11 +57,17 @@ module.exports = {
 			next();
 		}
 	},
-	socketHandler: {
+
+	/**
+	 * attach clout socket manager to socket
+	 * @property {event} event start
+	 * @property {priority} priority 28
+	 */
+	socketManager: {
 		event: 'start',
-		priority: 27,
+		priority: 28,
 		fn: function (next) {
-			this.logger.info('attaching clout-js socketHandler');
+			this.logger.info('attaching clout-js CloutSocketManager');
 			this.modules.socketManager = new CloutSocketManager(this);
 			next();
 		}

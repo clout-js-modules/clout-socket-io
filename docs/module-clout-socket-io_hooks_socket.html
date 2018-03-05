@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Global - Documentation</title>
+    <title>clout-socket-io/hooks/socket - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Global</h1>
+    <h1 class="page-title">clout-socket-io/hooks/socket</h1>
     
 
     
@@ -41,9 +41,6 @@
 
 <header>
     
-        <h2>
-        
-        </h2>
         
     
 </header>
@@ -52,45 +49,6 @@
     <div class="container-overview">
     
         
-
-        
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
 
         
     
@@ -112,13 +70,13 @@
         
             
 <div class="section-members">
-<h4 class="name" id="CLOUT_SOCKET_HANDLER_DEFAULTS"><span class="type-signature">(constant) </span>CLOUT_SOCKET_HANDLER_DEFAULTS<span class="type-signature"> :object</span></h4>
+<h4 class="name" id=".initialize"><span class="type-signature">(static) </span>initialize<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    Priority for core hooks
+    add socket.io to server
 </div>
 
 
@@ -151,13 +109,13 @@
 
         <tr>
             
-                <td class="name"><code>type</code></td>
+                <td class="name"><code>event</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><code>string</code></span>
+<span class="param-type"><code>event</code></span>
 
 
             
@@ -167,7 +125,7 @@
 
             
 
-            <td class="description last">on</td>
+            <td class="description last">start</td>
         </tr>
 
         
@@ -176,13 +134,13 @@
 
         <tr>
             
-                <td class="name"><code>nsp</code></td>
+                <td class="name"><code>priority</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><code>string</code></span>
+<span class="param-type"><code>priority</code></span>
 
 
             
@@ -192,32 +150,7 @@
 
             
 
-            <td class="description last">/</td>
-        </tr>
-
-        
-
-    
-
-        <tr>
-            
-                <td class="name"><code>hooks</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>array</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">[]</td>
+            <td class="description last">26</td>
         </tr>
 
         
@@ -258,7 +191,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="hookslib_CloutSocketHandler.js.html">hookslib/CloutSocketHandler.js</a>, <a href="hookslib_CloutSocketHandler.js.html#line8">line 8</a>
+        <a href="hooks_socket.js.html">hooks/socket.js</a>, <a href="hooks_socket.js.html#line19">line 19</a>
     </li></ul></dd>
     
 
@@ -271,15 +204,291 @@
 
 
 
-    <h5>Type:</h5>
-    <ul>
-        <li>
+
+
+
+
+</div>
+
+        
             
-<span class="param-type"><code>object</code></span>
+<div class="section-members">
+<h4 class="name" id=".middleware"><span class="type-signature">(static) </span>middleware<span class="type-signature"></span></h4>
 
 
-        </li>
-    </ul>
+
+
+<div class="description">
+    attach clout middleware to socket
+</div>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>event</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">start</td>
+        </tr>
+
+        
+
+    
+
+        <tr>
+            
+                <td class="name"><code>priority</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>priority</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">27</td>
+        </tr>
+
+        
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="hooks_socket.js.html">hooks/socket.js</a>, <a href="hooks_socket.js.html#line34">line 34</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id=".socketManager"><span class="type-signature">(static) </span>socketManager<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    attach clout socket manager to socket
+</div>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>event</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">start</td>
+        </tr>
+
+        
+
+    
+
+        <tr>
+            
+                <td class="name"><code>priority</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>priority</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">28</td>
+        </tr>
+
+        
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="hooks_socket.js.html">hooks/socket.js</a>, <a href="hooks_socket.js.html#line66">line 66</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
 
 
 
