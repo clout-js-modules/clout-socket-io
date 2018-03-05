@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>CloutSocketManager.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Tutorials</li><li class="nav-item"><a href="tutorial-1-handle-a-socket.html">1-handle-a-socket</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="CloutSocketHandler.html">CloutSocketHandler</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CloutSocketHandler.html#attachToClient">attachToClient</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="CloutSocketManager.html">CloutSocketManager</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CloutSocketManager.html#createNamespace">createNamespace</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CloutSocketManager.html#initializeSocketHandlersForFiles">initializeSocketHandlersForFiles</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CloutSocketManager.html#onConnection">onConnection</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="CloutSocketManager.html#onDisconnect">onDisconnect</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#CLOUT_SOCKET_HANDLER_DEFAULTS">CLOUT_SOCKET_HANDLER_DEFAULTS</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">CloutSocketManager.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*!
+ * clout-socket-io
+ * Copyright(c) 2018 Muhammad Dadu
+ * MIT Licensed
+ */
+const _ = require('lodash');
+const path = require('path');
+const { getGlobbedFiles } = require('clout-js/lib/utils');
+const CloutSocketHandler = require('./CloutSocketHandler');
+
+/**
+ * CloutSocketManager
+ * @class
+ */
+class CloutSocketManager {
+
+    /**
+     * @constructor
+     * @param {object} io socket.io instance
+     */
+    constructor(clout) {
+        this.clout = clout;
+        this.logger = clout.logger;
+        this.io = clout.sio;
+        this.handlers = {};
+
+        this.initialize();
+    }
+
+    createGlobForPath(path) {
+        return path.join(path, 'sockets/**.js');
+    }
+
+    initialize() {
+        let applicationSocketsGlob = this.createGlobForPath(this.clout.rootDirectory);
+        let moduleSocketsGlobs = this.clout.modules.map((module) => this.createGlobForPath(module.path));
+
+        this.initializeSocketHandlersForFiles(applicationSocketsGlob);
+        moduleSocketsGlobs.forEach((path) => this.initializeSocketHandlersForFiles(path));
+    }
+
+    /**
+     * initializes socket handling for files
+     * @param {array} files
+     */
+    initializeSocketHandlersForFiles(files) {
+        this.logger.debug(`loading socket handlers from '${files}'`);
+
+        files.forEach((filePath) => {
+            let file = require(filePath);
+            let names = Object.keys(file);
+            let group = path.basename(filePath, 'js');
+
+            this.logger.debug(`loading socket handler from file '${filePath}'`);
+
+            names.forEach((name) => {
+                let handlerOpts = Object.assign({
+                    name: name,
+                    group: group,
+                }, file[name]);
+                let handler = new CloutSocketHandler(handlerOpts);
+
+                if (!this.handlers[handler.nsp]) {
+                    this.createNamespace(handler.nsp);
+                }
+
+                this.handlers[handler.nsp].push(handler);
+            });
+        });
+
+        this.logger.debug(`loading socket handlers '${this.handlers}'`);
+    }
+
+    /**
+     * attaches socket handling to namespace
+     * @param {string} name
+     */
+    createNamespace(name) {
+        this.handlers[name] = [];
+        this.io.of(name).on('connection', (client) => this.onConnection(client));
+    }
+
+    /**
+     * onConnection
+     * @param {object} socket
+     * @param {object} socket.id
+     */
+    onConnection(socket) {
+        let handlers = this.handlers[socket.nsp.name] || [];
+
+        socket.on('disconnect', () => this.onDisconnect(socket));
+        handlers.forEach((handler) => handler.attachToClient(client));
+    }
+
+    /**
+     * onDisconnect
+     * @param {object} client
+     * @param {object} client.id
+     */
+    onDisconnect(client) {
+        
+    }
+}
+
+module.exports = CloutSocketManager;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Mar 05 2018 20:57:53 GMT+0000 (GMT) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

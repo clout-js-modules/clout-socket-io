@@ -1,10 +1,13 @@
 {
   "name": "clout-socket-io",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Clout module to leverage socket.io",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "start": "node .",
+    "grunt": "grunt",
+    "test": "grunt test",
+    "gendoc": "grunt gendoc"
   },
   "repository": {
     "type": "git",
@@ -26,5 +29,17 @@
   "homepage": "https://github.com/clout-js-modules/clout-socket-io#readme",
   "dependencies": {
     "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "eslint": "^4.17.0",
+    "grunt": "^1.0.2",
+    "grunt-jsdoc": "^2.2.1",
+    "grunt-mocha-test": "^0.13.3",
+    "jsdoc": "^3.5.5",
+    "minami": "^1.2.3",
+    "mocha": "^5.0.0",
+    "request": "^2.83.0",
+    "should": "^13.2.1",
+    "sinon": "^4.2.2"
   }
 }

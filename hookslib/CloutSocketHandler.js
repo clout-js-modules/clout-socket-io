@@ -7,7 +7,7 @@ const { each } = require('async');
 
 /**
  * Priority for core hooks
- * @typedef {object)} CLOUT_SOCKET_HANDLER_DEFAULTS
+ * @typedef {object} CLOUT_SOCKET_HANDLER_DEFAULTS
  * @property {string} type on
  * @property {string} nsp /
  * @property {array} hooks []
