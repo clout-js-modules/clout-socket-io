@@ -1,4 +1,4 @@
-clout-socket-io
+clout-socket-io [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url]
 ==================
 ## Install
 In the directory of your clout-js application, do the following;
@@ -30,3 +30,7 @@ sio.sockets.on("connection", function(socket) {
 });
 ```
 
+[npm-image]: https://badge.fury.io/js/clout-socket-io.svg
+[npm-url]: https://npmjs.org/package/clout-socket-io
+[travis-image]: https://travis-ci.org/clout-js-moules/clout-socket-io.svg?branch=master
+[travis-url]: https://travis-ci.org/clout-js-moules/clout-socket-io
