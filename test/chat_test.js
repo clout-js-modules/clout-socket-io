@@ -27,16 +27,20 @@ describe('module: clout-socket-io', () => {
 
     describe('/chat test', () => {
         let client1;
+        let client2;
 
         before((done) => {
             client1 = io.connect(testLib.config.serverAddress + '/chat', DEFAULT_SOCKET_OPTIONS);
+            client1.on('connect', () => done());
+        });
 
-            client1.on('connect', () => {
-                done();
-            });
+        before((done) => {
+            client2 = io.connect(testLib.config.serverAddress + '/chat', DEFAULT_SOCKET_OPTIONS);
+            client2.on('connect', () => done());
         });
 
         after(() => client1.close());
+        after(() => client2.close());
 
         it('client1 should join general', (done) => {
             client1.emit('join', 'general', (err) => {
@@ -45,15 +49,15 @@ describe('module: clout-socket-io', () => {
             });
         });
 
-        it('client1 should send messege on general', (done) => {
-            client1.emit('send_messege', {
-                roomName: 'general',
-                messege: 'hello world!'
-            }, (err) => {
+        it('client2 should join general', (done) => {
+            client2.emit('join', 'general', (err) => {
                 should(err).be.equal(null);
+                done()
             });
+        });
 
-            client1.on('messege', (data) => {
+        it('client1 should send messege on general and client2 should recieve', (done) => {
+            client2.on('messege', (data) => {
                 should(data).be.deepEqual({
                     from: client1.id,
                     roomName: 'general',
@@ -61,9 +65,23 @@ describe('module: clout-socket-io', () => {
                 });
                 done();
             });
+
+            client1.emit('send_messege', {
+                roomName: 'general',
+                messege: 'hello world!'
+            }, (err) => {
+                should(err).be.equal(null);
+            });
         });
 
-        it('client1 leave join general', (done) => {
+        it('client1 leave general', (done) => {
+            client1.emit('leave', 'general', (err) => {
+                should(err).be.equal(null);
+                done()
+            });
+        });
+
+        it('client2 leave general', (done) => {
             client1.emit('leave', 'general', (err) => {
                 should(err).be.equal(null);
                 done()
