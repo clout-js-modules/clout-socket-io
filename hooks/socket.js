@@ -4,6 +4,7 @@
  * MIT Licensed
  */
 const socket = require('socket.io');
+const CloutSocketManager = require('../hookslib/CloutSocketManager');
 
 module.exports = {
 	initialize: {
@@ -21,7 +22,7 @@ module.exports = {
 		fn: function (next) {
 			let sessionMiddleware = this.app.session;
 
-			this.logger.info('attaching clout-js middleware to socket');
+			this.logger.info('attaching clout-js middleware');
 
 			// append session information from express
 			this.sio.use((socket, next) => {
@@ -38,6 +39,15 @@ module.exports = {
 				sessionMiddleware(socket.request, socket.request.res, next);
 			});
 
+			next();
+		}
+	},
+	socketHandler: {
+		event: 'start',
+		priority: 27,
+		fn: function (next) {
+			this.logger.info('attaching clout-js socketHandler');
+			this.modules.socketManager = new CloutSocketManager(this);
 			next();
 		}
 	}
