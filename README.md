@@ -32,5 +32,5 @@ sio.sockets.on("connection", function(socket) {
 
 [npm-image]: https://badge.fury.io/js/clout-socket-io.svg
 [npm-url]: https://npmjs.org/package/clout-socket-io
-[travis-image]: https://travis-ci.org/clout-js-moules/clout-socket-io.svg?branch=master
-[travis-url]: https://travis-ci.org/clout-js-moules/clout-socket-io
+[travis-image]: https://travis-ci.org/clout-js-modules/clout-socket-io.svg?branch=master
+[travis-url]: https://travis-ci.org/clout-js-modules/clout-socket-io
