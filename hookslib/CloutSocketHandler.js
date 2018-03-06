@@ -58,7 +58,7 @@ class CloutSocketHandler {
 
     _handle(socket, data, next) {
         each(this.hooks,
-            (hook, next) => _call(socket, hook, data, next),
+            (hook, next) => this._call(socket, hook, data, next),
             (err) => {
                 if (err) { return next(err); }
                 this._call(socket, this.fn, data, next);
