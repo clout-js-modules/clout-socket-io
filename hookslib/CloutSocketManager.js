@@ -8,6 +8,17 @@ const path = require('path');
 const { getGlobbedFiles } = require('clout-js/lib/utils');
 const CloutSocketHandler = require('./CloutSocketHandler');
 
+
+function loadFile(filePath) {
+    let file = require(filePath);
+    let names = Object.keys(file);
+    let group = path.basename(filePath, 'js');
+
+    console.log(`loading file '${filePath}'`);
+
+    return {file, names, group};
+}
+
 /**
  * CloutSocketManager
  * @class
@@ -47,17 +58,10 @@ class CloutSocketManager {
         this.logger.debug(`loading socket handlers from '${files}'`);
 
         files.forEach((filePath) => {
-            let file = require(filePath);
-            let names = Object.keys(file);
-            let group = path.basename(filePath, 'js');
-
-            this.logger.debug(`loading socket handler from file '${filePath}'`);
+            const {file, names, group} = loadFile(filePath);
 
             names.forEach((name) => {
-                let handlerOpts = Object.assign({
-                    name: name,
-                    group: group,
-                }, file[name]);
+                let handlerOpts = Object.assign({ name: name, group: group, }, file[name]);
                 let handler = new CloutSocketHandler(handlerOpts);
 
                 if (!this.handlers[handler.nsp]) {
@@ -98,8 +102,11 @@ class CloutSocketManager {
      * @param {object} client.id
      */
     onDisconnect(client) {
-        
+
     }
 }
 
 module.exports = CloutSocketManager;
+module.exports.utils = {
+    loadFile
+};

@@ -49,21 +49,36 @@ class CloutSocketHandler {
      * @param {object} socket socket.io socket object
      */
     attachToClient(socket) {
-        socket[this.type](this.event, (data, next) => this._handle(socket, data, next));
+        return socket[this.type](this.event, (data, next) => {
+            this._handle(socket, data)
+                .then((data) => next(null, data))
+                .catch((err) => next(err))
+        });
     }
 
-    _call(socket, fn, data, next) {
-        fn.apply({ socket }, [data, next]);
+    _call(socket, fn, data) {
+        const newContext = { socket };
+
+        return new Promise((resolve, reject) => {
+            const cb = (err, data) => {
+                if (err) {
+                    return reject(err);
+                }
+
+                resolve(data);
+            };
+
+            return Promise.resolve()
+                .then(() => fn.apply(newContext, [data, cb]))
+                .then((data) => resolve(data))
+                .catch((err) => reject(err))
+        });
     }
 
-    _handle(socket, data, next) {
-        each(this.hooks,
-            (hook, next) => this._call(socket, hook, data, next),
-            (err) => {
-                if (err) { return next(err); }
-                this._call(socket, this.fn, data, next);
-            }
-        );
+    _handle(socket, data) {
+        const hookDefinitions = this.hooks.map((def) => this._call(socket, def, data));
+
+        return Promise.all(hookDefinitions).then(() => this._call(socket, this.fn, data))
     }
 }
 

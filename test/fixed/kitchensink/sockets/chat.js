@@ -19,7 +19,7 @@ module.exports = {
         namespace: '/chat',
         fn(roomName, cb) {
             this.socket.leave(roomName);
-            cb(null, 'Success');
+            return 'Success';
         }
     },
     sendMessege: {

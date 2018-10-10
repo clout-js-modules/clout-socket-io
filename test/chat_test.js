@@ -30,13 +30,15 @@ describe('module: clout-socket-io', () => {
         let client2;
 
         before((done) => {
+            let doneOnce = false;
             client1 = io.connect(testLib.config.serverAddress + '/chat', DEFAULT_SOCKET_OPTIONS);
-            client1.on('connect', () => done());
+            client1.on('connect', () => doneOnce || (doneOnce = true) && done())
         });
 
         before((done) => {
+            let doneOnce = false;
             client2 = io.connect(testLib.config.serverAddress + '/chat', DEFAULT_SOCKET_OPTIONS);
-            client2.on('connect', () => done());
+            client2.on('connect', () => doneOnce || (doneOnce = true) && done())
         });
 
         after(() => client1.close());

@@ -7,6 +7,7 @@
     "start": "node .",
     "grunt": "grunt",
     "test": "grunt test",
+    "test:debug": "grunt test",
     "gendoc": "grunt gendoc"
   },
   "repository": {
